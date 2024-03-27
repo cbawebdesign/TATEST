@@ -105,7 +105,7 @@ export default function UploadPage() {
     }
   };
 const buttonStyle = {
-    backgroundColor: '#FF00FF', /* Dark Blue */
+    backgroundColor: '#00008B', /* Dark Blue */
     border: 'none',
     color: 'white',
     padding: '15px 32px',
@@ -191,7 +191,7 @@ const buttonStyle = {
         <h2 style={{ marginTop: '20px' }}>Uploaded files:</h2>
         {uploadedFiles.map((file, index) => (
           <div key={index} style={uploadedFileStyle}>
-            <h2 style={{     color: '#FF00FF' 
+            <h2 style={{     color: '#00008B' 
             }}>
               File: {file.fileName}
             </h2>

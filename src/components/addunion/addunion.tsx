@@ -36,17 +36,17 @@ export default function AddUnionPage() {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'center', alignItems: 'flex-end' }}>
         <label>
           Union Name:
-          <input type="text" value={unionName} onChange={(e) => setUnionName(e.target.value)} required style={{ border: '1px solid #FF00FF', color: 'black' }} />
+          <input type="text" value={unionName} onChange={(e) => setUnionName(e.target.value)} required style={{ border: '1px solid #00008B', color: 'black' }} />
         </label>
         <label>
           Union Code:
-          <input type="text" value={unionCode} onChange={(e) => setUnionCode(e.target.value)} required style={{ border: '1px solid #FF00FF', color: 'black' }} />
+          <input type="text" value={unionCode} onChange={(e) => setUnionCode(e.target.value)} required style={{ border: '1px solid #00008B', color: 'black' }} />
         </label>
         <label>
           Sub Code:
-          <input type="text" value={subCode} onChange={(e) => setSubCode(e.target.value)} required style={{ border: '1px solid #FF00FF', color: 'black' }} />
+          <input type="text" value={subCode} onChange={(e) => setSubCode(e.target.value)} required style={{ border: '1px solid #00008B', color: 'black' }} />
         </label>
-        <button type="submit" style={{ backgroundColor: '#FF00FF', color: 'white', padding: '10px', borderRadius: '5px', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>Create Union</button>
+        <button type="submit" style={{ backgroundColor: '#00008B', color: 'white', padding: '10px', borderRadius: '5px', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>Create Union</button>
       </form>
       {successMessage && <p style={{ color: 'green', marginTop: '20px', marginBottom: '20px' }}>{successMessage}</p>} {/* Display success message if it exists */}
     </div>

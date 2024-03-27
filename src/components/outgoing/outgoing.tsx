@@ -76,8 +76,8 @@ const deleteLine = (documentId: string, lineIndex: number) => {
 
 return (
     <div>
-      <div style={{ marginBottom: '20px', border: '2px solid fuchsia', padding: '10px' }}>
-        <h2 style={{ color: 'fuchsia', textAlign: 'center' }}>Weekly Changes:</h2>
+      <div style={{ marginBottom: '20px', border: '2px solid blue', padding: '10px' }}>
+        <h2 style={{ color: 'blue', textAlign: 'center' }}>Weekly Changes:</h2>
         {documents.map((document, documentIndex) => (
           <div key={documentIndex}>
             {document.change && <pre>
@@ -90,8 +90,8 @@ return (
           </div>
         ))}
       </div>
-      <div style={{ marginTop: '20px', border: '2px solid fuchsia', padding: '10px' }}>
-      <h2 style={{ color: 'fuchsia', textAlign: 'center' }}>NY Output Files Que:</h2>
+      <div style={{ marginTop: '20px', border: '2px solid blue', padding: '10px' }}>
+      <h2 style={{ color: 'blue', textAlign: 'center' }}>NY Output Files Que:</h2>
       {documentsTwo.map((document, documentIndex) => (
         <div key={documentIndex}>
           {document.change && document.change.map((line, lineIndex) => (
@@ -112,8 +112,8 @@ return (
     </div>
 
 
-    <div style={{ marginTop: '20px', border: '2px solid fuchsia', padding: '10px' }}>
-  <h2 style={{ color: 'fuchsia', textAlign: 'center' }}>Sent NY Files:</h2>
+    <div style={{ marginTop: '20px', border: '2px solid blue', padding: '10px' }}>
+  <h2 style={{ color: 'blue', textAlign: 'center' }}>Sent NY Files:</h2>
   <h2 style={{  textAlign: 'left' }}>Sent 3-21-24</h2>
   <pre>
     {`1536379     F459270015363790000002024-03-218271C2024-03-21605BM68412024-03-200000000000000

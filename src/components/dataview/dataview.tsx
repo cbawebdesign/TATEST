@@ -135,7 +135,7 @@ const yearList = generateYearList(2024, 2035);
     'MASTER_SHEET_CHANGES': 'MASTER_SHEET_CHANGES',
   };
   const buttonStyle = {
-    backgroundColor: '#FF00FF', /* Fuchsia */
+    backgroundColor: '#000435', /* Fuchsia */
     border: 'none',
     color: 'white',
     padding: '15px 32px',
@@ -151,13 +151,13 @@ const yearList = generateYearList(2024, 2035);
   const boxStyle = {
     marginTop: '20px', 
     marginBottom: '20px', 
-    border: '1px solid #FF00FF', 
+    border: '1px solid #000435', 
     padding: '10px',
     borderRadius: '15px', // This will make the border rounded
     boxShadow: '5px 5px 15px rgba(0, 0, 0, 0.3)', // This will give it a 3D effect
   };
   const sectionStyle = {
-    border: '1px solid #FF00FF',
+    border: '1px solid #000435',
     borderRadius: '10px',
     padding: '10px',
     margin: '20px 0',
@@ -260,7 +260,7 @@ const yearList = generateYearList(2024, 2035);
   <div>
   <div style={{ display: 'inline-block', borderBottom: '2px solid black', paddingBottom: '5px' }}>
   <h2 style={{ marginTop: '20px', fontSize: '25px', fontWeight: 'bold' }}>Document Queue:</h2>
-</div>    <div style={{...sectionStyle, border: '1px solid #FF00FF', padding: '10px', margin: '10px'}}>     
+</div>    <div style={{...sectionStyle, border: '1px solid #00008B', padding: '10px', margin: '10px'}}>     
 
       <h2 style={{ fontFamily: 'Arial, sans-serif' }}>
         L831 
@@ -286,7 +286,7 @@ const yearList = generateYearList(2024, 2035);
             }
             return filteredData.map((data, index) => (
               <div key={index} style={boxStyle}>
-                <h2 style={{ color: '#FF00FF' }}>SubCategory: {data.subCategory}</h2>
+                <h2 style={{ color: '#00008B' }}>SubCategory: {data.subCategory}</h2>
                 <p>Decrypted image title: {data.image}</p>
                 <a href={data.url} download target="_blank">
                   <button style={buttonStyle}>Download</button>
@@ -298,7 +298,7 @@ const yearList = generateYearList(2024, 2035);
       )}
     </div>
 
-    <div style={{...sectionStyle, border: '1px solid #FF00FF', padding: '10px', margin: '10px'}}>
+    <div style={{...sectionStyle, border: '1px solid #00008B', padding: '10px', margin: '10px'}}>
       <h2 style={{ fontFamily: 'Arial, sans-serif' }}>
         COBA 
         <button 
@@ -323,7 +323,7 @@ const yearList = generateYearList(2024, 2035);
             }
             return filteredData.map((data, index) => (
               <div key={index} style={boxStyle}>
-                <h2 style={{ color: '#FF00FF' }}>SubCategory: {data.subCategory}</h2>
+                <h2 style={{ color: '#00008B' }}>SubCategory: {data.subCategory}</h2>
                 <p>Decrypted data for ID {data.id}:</p>
                 <p>Document title: {data.image}</p>
                 <a href={data.url} download target="_blank">
@@ -335,7 +335,7 @@ const yearList = generateYearList(2024, 2035);
         </div>
       )}
     </div>
-    <div style={{...sectionStyle, border: '1px solid #FF00FF', padding: '10px', margin: '10px'}}>
+    <div style={{...sectionStyle, border: '1px solid #00008B', padding: '10px', margin: '10px'}}>
     <h2 style={{ fontFamily: 'Arial, sans-serif' }}>
       MISC 
       <button 
@@ -360,7 +360,7 @@ const yearList = generateYearList(2024, 2035);
           }
           return filteredData.map((data, index) => (
             <div key={index} style={boxStyle}>
-              <h2 style={{ color: '#FF00FF' }}>SubCategory: {data.subCategory}</h2>
+              <h2 style={{ color: '#00008B' }}>SubCategory: {data.subCategory}</h2>
               <p>Document title: {data.image}</p>
               <a href={data.url} download target="_blank">
                 <button style={buttonStyle}>Download</button>
