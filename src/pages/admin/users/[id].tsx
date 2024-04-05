@@ -436,7 +436,9 @@ const [DeductionStatusInput, setDeductionStatusInput] = useState('');
   value={unionInput}
   onChange={(e) => setUnionInput((e.target as HTMLSelectElement).value)}
 >
-<option value="COBA">COBA</option>
+
+  <option value="">Set Union</option>
+    <option value="COBA">COBA</option>
     <option value="L831">L831</option>
 </select>
     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
