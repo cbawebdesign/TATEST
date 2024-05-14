@@ -55,7 +55,7 @@
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #00008B;
+  background-color: #FF00FF;
   color: white;
 }
 
@@ -68,7 +68,7 @@
   border-radius: 4px;
 }
 .submitButton {
-  background-color: #00008B; /* Green background */
+  background-color: #FF00FF; /* Green background */
   border: none; /* Remove border */
   color: white; /* White text */
   padding: 15px 32px; /* Padding */

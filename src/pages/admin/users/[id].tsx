@@ -343,7 +343,7 @@ const [DeductionStatusInput, setDeductionStatusInput] = useState('');
   
             <div className="space-y-4 max-w-md mx-auto">
   <input type="file" onChange={handleFileChange} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-  <button onClick={handleUpload} className="w-full px-3 py-2 bg-blue-900 text-white rounded-md">Upload</button>
+  <button onClick={handleUpload} className="w-full px-3 py-2 bg-fuchsia-900 text-white rounded-md">Upload</button>
     <div className="relative pt-1">
     <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
       <div style={{ width: `${uploadProgress}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"></div>
@@ -436,9 +436,7 @@ const [DeductionStatusInput, setDeductionStatusInput] = useState('');
   value={unionInput}
   onChange={(e) => setUnionInput((e.target as HTMLSelectElement).value)}
 >
-
-  <option value="">Set Union</option>
-    <option value="COBA">COBA</option>
+<option value="COBA">COBA</option>
     <option value="L831">L831</option>
 </select>
     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">

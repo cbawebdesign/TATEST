@@ -10,7 +10,7 @@ export default function UploadPage() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string>('');
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
-  const categories = ['MASTER_SHEET','PAYFILE_RAW', 'PAYFILE_EXTRACTED', 'MISMATCHED_PREMIUMS', 'USERS_NOT_IN_DATABASE', 'PREMIUM_HISTORY_ALL', 'PREMIUM_MISMATCHES_ALL', 'DEDUCTION_STATUS_CHANGES', 'MASTER_SHEET_CHANGES','PastPayFile'];
+  const categories = ['MASTER_SHEET','PAYFILE_RAW', 'PAYFILE_EXTRACTED', 'MISMATCHED_PREMIUMS', 'USERS_NOT_IN_DATABASE', 'PREMIUM_HISTORY_ALL', 'PREMIUM_MISMATCHES_ALL', 'DEDUCTION_STATUS_CHANGES', 'MASTER_SHEET_CHANGES','PastPayFile','SENT_NY_FILES', 'ACTIVE_USERS_MISSING'];
   const [hasError, setHasError] = useState(false);
   const [union, setUnion] = useState<string>('');
   const unionOptions = ['COBA', 'L831', 'MISC','MASTER_SHEET'];
@@ -32,6 +32,7 @@ export default function UploadPage() {
   const handleUnionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUnion(event.target.value);
   };
+
   const handleUpload = async () => {
     if (!files || !isSdkInitialized) return;
     if (!selectedCategories) {
@@ -48,7 +49,7 @@ export default function UploadPage() {
             folder = 'pastpaycoba';
             break;
           case 'L831':
-            folder = 'pastpayL831';
+            folder = 'pastpayl831';
             break;
           default:
             folder = 'pastpayfiles';
@@ -58,7 +59,7 @@ export default function UploadPage() {
         folder = 'mastersheets';
       }
       const storageRef = ref(storage, `${folder}/${file.name}`);
-      
+
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on('state_changed', 
@@ -120,7 +121,7 @@ export default function UploadPage() {
     }
   };
 const buttonStyle = {
-    backgroundColor: '#00008B', /* Dark Blue */
+    backgroundColor: '#FF00FF', /* Dark Blue */
     border: 'none',
     color: 'white',
     padding: '15px 32px',
@@ -206,7 +207,7 @@ const buttonStyle = {
         <h2 style={{ marginTop: '20px' }}>Uploaded files:</h2>
         {uploadedFiles.map((file, index) => (
           <div key={index} style={uploadedFileStyle}>
-            <h2 style={{     color: '#00008B' 
+            <h2 style={{     color: '#FF00FF' 
             }}>
               File: {file.fileName}
             </h2>

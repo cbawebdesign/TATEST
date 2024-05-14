@@ -4,7 +4,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         try {
             // Use the URL of your Google Cloud Function
-            const cloudFunctionUrl = 'https://us-central1-mobiledevtests-e9c70.cloudfunctions.net/pull_latest_changes';
+            const cloudFunctionUrl = 'https://us-central1-amidnight1a.cloudfunctions.net/pull_latest_changes';
 
             const response = await fetch(cloudFunctionUrl, { method: 'POST' });
             const data = await response.text();
