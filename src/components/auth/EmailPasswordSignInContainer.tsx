@@ -35,18 +35,20 @@ const EmailPasswordSignInContainer: React.FCC<{
 }> = ({ onSignIn, shouldVerifyEmail }) => {
   const auth = useAuth();
 
-  const [sessionRequest, sessionState] = useCreateServerSideSession();
+  const sessionRequest = useCreateServerSideSession();
   const requestState = useRequestState<void>();
 
   const [multiFactorAuthError, setMultiFactorAuthError] =
     useState<Maybe<MultiFactorError>>();
 
   const [showVerificationAlert, setShowVerificationAlert] = useState<boolean>(
-    shouldVerifyEmail ?? false
+    shouldVerifyEmail ?? false,
   );
 
   const isLoading = Boolean(
-    sessionState.loading || requestState.state.loading || sessionState.success
+    sessionRequest.isMutating ||
+      requestState.state.loading ||
+      sessionRequest.data,
   );
 
   const signInWithCredentials = useCallback(
@@ -73,7 +75,7 @@ const EmailPasswordSignInContainer: React.FCC<{
         if (credential) {
           // using the ID token, we will make a request to initiate the session
           // to make SSR possible via session cookie
-          await sessionRequest(credential.user);
+          await sessionRequest.trigger(credential.user);
 
           // we notify the parent component that
           // the user signed in successfully, so they can be redirected
@@ -87,11 +89,15 @@ const EmailPasswordSignInContainer: React.FCC<{
         }
       }
     },
-    [isLoading, auth, sessionRequest, onSignIn, requestState]
+    [isLoading, auth, sessionRequest, onSignIn, requestState],
   );
 
   return (
     <>
+      <If condition={sessionRequest.error}>
+        <AuthErrorMessage error={sessionRequest.error} />
+      </If>
+
       <If condition={requestState.state.error}>
         <AuthErrorMessage
           error={getFirebaseErrorCode(requestState.state.error)}
@@ -122,7 +128,7 @@ const EmailPasswordSignInContainer: React.FCC<{
               }
             }}
             onSuccess={async (credential) => {
-              await sessionRequest(credential.user);
+              await sessionRequest.trigger(credential.user);
 
               // we notify the parent component that
               // the user signed in successfully, so they can be redirected
@@ -137,7 +143,7 @@ const EmailPasswordSignInContainer: React.FCC<{
 
 async function getCredential(
   auth: Auth,
-  params: { email: string; password: string }
+  params: { email: string; password: string },
 ) {
   const { email, password } = params;
   const user = auth.currentUser;

@@ -1,3 +1,5 @@
+import { GetStaticPropsContext } from 'next';
+
 import Head from 'next/head';
 import { Trans } from 'next-i18next';
 
@@ -56,11 +58,7 @@ const NotFoundPage = () => {
                 </div>
 
                 <div className={'flex space-x-4'}>
-                  <Button variant={'secondary'} href={'/'}>
-                    <Trans i18nKey={'common:contactUs'} />
-                  </Button>
-
-                  <Button href={'/'}>
+                  <Button variant={'outline'} href={'/'}>
                     <Trans i18nKey={'common:backToHomePage'} />
                   </Button>
                 </div>
@@ -73,11 +71,11 @@ const NotFoundPage = () => {
   );
 };
 
-export async function getStaticProps() {
-  const { props } = await withTranslationProps();
+export async function getStaticProps({ locale }: GetStaticPropsContext) {
+  const { props } = await withTranslationProps({ locale });
 
   return {
-    props,
+    props
   };
 }
 

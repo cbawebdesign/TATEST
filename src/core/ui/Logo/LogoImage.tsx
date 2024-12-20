@@ -1,14 +1,16 @@
 
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 const LogoImage: React.FC<{
   className?: string;
-}> = ({ className }) => {
-  const logoUrl = 'https://firebasestorage.googleapis.com/v0/b/tubcadmintest.appspot.com/o/Tri-State%20Benefits%20Logo-PhotoRoom.png-PhotoRoom.png?alt=media&token=e1fbc40f-167c-4afe-9f33-971a1331e599'; // Replace with your actual image URL
+  style?: CSSProperties;
+}> = ({ className, style }) => { // Add style here
+  const logoUrl = 'https://firebasestorage.googleapis.com/v0/b/tradecompanion-71fd4.appspot.com/o/Screenshot%20at%20Oct%2027%2018-17-29.png?alt=media&token=4a42e933-2f04-48d7-92db-e3f68d8a88e1'; // Replace with your actual image URL
 
   return (
     <img
       className={`${className ?? 'w-[95px] sm:w-[105px]'}`}
+      style={style} // Now style is defined
       src={logoUrl}
       alt="Logo"
     />

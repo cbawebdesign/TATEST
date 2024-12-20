@@ -1,6 +1,7 @@
 import { getOrganizationById } from '../queries';
 import { Organization } from '~/lib/organizations/types/organization';
 import { getOrganizationsCollection } from '~/lib/server/collections';
+import { MembershipRole } from '~/lib/organizations/types/membership-role';
 
 /**
  * @name getCurrentOrganization
@@ -8,7 +9,7 @@ import { getOrganizationsCollection } from '~/lib/server/collections';
  */
 export async function getCurrentOrganization(
   userId: string,
-  organizationId: Maybe<string> = undefined
+  organizationId: Maybe<string> = undefined,
 ) {
   return getOrganizationByIdOrFirst(organizationId, userId);
 }
@@ -27,7 +28,7 @@ export async function getCurrentOrganization(
  */
 async function getOrganizationByIdOrFirst(
   organizationId: Maybe<string>,
-  userId: string
+  userId: string,
 ) {
   // if the organization ID was passed from the cookie, we try read that
   if (organizationId) {
@@ -76,7 +77,15 @@ async function getOrganizationData(organizationId: string) {
 }
 
 function serializeOrganizationData(organization: Organization, id: string) {
-  const members = Object.keys(organization.members).reduce((acc, userId) => {
+  const members = Object.keys(organization.members).reduce<
+    Record<
+      string,
+      {
+        role: MembershipRole;
+        user: string;
+      }
+    >
+  >((acc, userId) => {
     const member = organization.members[userId];
 
     const item = {

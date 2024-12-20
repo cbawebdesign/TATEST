@@ -3,6 +3,7 @@ import Image from 'next/image';
 import {
   AtSymbolIcon,
   DevicePhoneMobileIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 
 const DEFAULT_IMAGE_SIZE = 22;
@@ -17,6 +18,7 @@ const AuthProviderLogo: React.FC<{
   if (typeof image === `string`) {
     return (
       <Image
+        priority
         src={image}
         alt={`${firebaseProviderId} logo`}
         width={width ?? DEFAULT_IMAGE_SIZE}
@@ -30,6 +32,7 @@ const AuthProviderLogo: React.FC<{
 
 function getOAuthProviderLogos(): Record<string, string | JSX.Element> {
   return {
+    ['anonymous']: <EyeSlashIcon className={'h-[22px] w-[22px]'} />,
     ['password']: <AtSymbolIcon className={'h-[22px] w-[22px]'} />,
     ['phone']: <DevicePhoneMobileIcon className={'h-[22px] w-[22px]'} />,
     ['google.com']: '/assets/images/google.webp',

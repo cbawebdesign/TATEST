@@ -17,9 +17,9 @@ import ReauthenticationModal from '~/components/auth/ReauthenticationModal';
 
 import If from '~/core/ui/If';
 import Alert from '~/core/ui/Alert';
+import LoadingOverlay from '~/core/ui/LoadingOverlay';
 
 import configuration from '~/configuration';
-import PageLoadingIndicator from '~/core/ui/PageLoadingIndicator';
 
 const ProfileAuthenticationPage: React.FC<{
   session: User & { multiFactor: MultiFactorInfo[] };
@@ -59,7 +59,7 @@ const ProfileAuthenticationPage: React.FC<{
       </Head>
 
       <If condition={refreshing}>
-        <PageLoadingIndicator />
+        <LoadingOverlay />
       </If>
 
       <ProfileSettingsTabs />
@@ -67,7 +67,7 @@ const ProfileAuthenticationPage: React.FC<{
       <SettingsContentContainer>
         <div className={'flex flex-col space-y-8'}>
           <SettingsTile
-            heading={<Trans i18nKey={'profile:manageConnectedAccounts'} />}
+            heading={<Trans i18nKey={'profile:authenticationTab'} />}
             subHeading={
               <Trans i18nKey={'profile:manageConnectedAccountsSubheading'} />
             }

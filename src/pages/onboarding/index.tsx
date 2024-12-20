@@ -1,82 +1,100 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { GetServerSidePropsContext } from 'next';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
 
 import configuration from '~/configuration';
 import { withUserProps } from '~/lib/props/with-user-props';
-
-import Logo from '~/core/ui/Logo';
 import If from '~/core/ui/If';
-import Layout from '~/core/ui/Layout';
+import Stepper from '~/core/ui/Stepper';
 
 import { CompleteOnboardingStep } from '~/components/onboarding/CompleteOnboardingStep';
 
 import {
   OrganizationInfoStep,
-  OrganizationInfoStepData,
+  OrganizationInfoStepData
 } from '~/components/onboarding/OrganizationInfoStep';
 
 import { withTranslationProps } from '~/lib/props/with-translation-props';
+import { OnboardingLayout } from '~/components/onboarding/OnboardingLayout';
+import { MembershipRole } from '~/lib/organizations/types/membership-role';
+import OrganizationInvitesStep from '~/components/onboarding/OrganizationInvitesStep';
+import { getLoggedInUser } from '~/core/firebase/admin/auth/get-logged-in-user';
 
-interface Data {
-  organization: string;
-}
+type Invite = {
+  email: string;
+  role: MembershipRole;
+};
 
-const appHome = configuration.paths.appHome;
+/**
+ * Represents the list of steps for a user onboarding process.
+ * The Array represents the list of step names to render within
+ * the Stepper component. You can either use the i18n key or the label itself.
+ *
+ * Update this array to add/remove steps from the onboarding process.
+ *
+ * @type {Array<string>}
+ */
+const STEPS: Array<string> = [
+  'onboarding:info',
+  'onboarding:invites',
+  'onboarding:complete'
+];
 
 const Onboarding = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [data, setData] = useState<Data>();
-  const router = useRouter();
+  const form = useForm({
+    defaultValues: {
+      data: {
+        organization: '',
+        invites: [] as Invite[]
+      },
+      currentStep: 0
+    }
+  });
 
-  const onFirstStepSubmitted = useCallback(
+  const nextStep = useCallback(() => {
+    form.setValue('currentStep', form.getValues('currentStep') + 1);
+  }, [form]);
+
+  const onInfoStepSubmitted = useCallback(
     (organizationInfo: OrganizationInfoStepData) => {
-      setData({
-        organization: organizationInfo.organization,
-      });
-
-      setCurrentStep(1);
+      form.setValue('data.organization', organizationInfo.organization);
+      nextStep();
     },
-    [],
+    [form, nextStep]
   );
 
-  // prefetch application home route
-  useEffect(() => {
-    void router.prefetch(appHome);
-  }, [router]);
+  const onInvitesStepSubmitted = useCallback(
+    (invites: Invite[]) => {
+      form.setValue('data.invites', invites);
+      form.setValue('currentStep', form.getValues('currentStep') + 1);
+    },
+    [form]
+  );
 
-  const onComplete = useCallback(() => {
-    void router.push(appHome);
-  }, [router]);
+  const currentStep = form.watch('currentStep');
+  const formData = form.watch('data');
+
+  const isStep = useCallback(
+    (step: number) => currentStep === step,
+    [currentStep]
+  );
 
   return (
-    <Layout>
-      <Head>
-        <title key="title">Onboarding</title>
-      </Head>
+    <OnboardingLayout>
+      <Stepper steps={STEPS} currentStep={currentStep} />
 
-      <div
-        className={
-          'flex h-screen flex-1 flex-col items-center justify-center' +
-          ' w-full space-y-24'
-        }
-      >
-        <Logo href={'/onboarding'} />
+      <If condition={isStep(0)}>
+        <OrganizationInfoStep onSubmit={onInfoStepSubmitted} />
+      </If>
 
-        <div className={'w-full max-w-xl'}>
-          <If condition={currentStep === 0}>
-            <OrganizationInfoStep onSubmit={onFirstStepSubmitted} />
-          </If>
+      <If condition={isStep(1)}>
+        <OrganizationInvitesStep onSubmit={onInvitesStepSubmitted} />
+      </If>
 
-          <If condition={currentStep === 1 && data}>
-            {(data) => (
-              <CompleteOnboardingStep data={data} onComplete={onComplete} />
-            )}
-          </If>
-        </div>
-      </div>
-    </Layout>
+      <If condition={isStep(2) && formData}>
+        {(data) => <CompleteOnboardingStep data={data} />}
+      </If>
+    </OnboardingLayout>
   );
 };
 
@@ -84,17 +102,24 @@ export default Onboarding;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { props } = await withUserProps(ctx);
-  const user = props.session;
+  const user = await getLoggedInUser(ctx);
 
   if (!user) {
     return redirectToSignIn();
   }
 
-  const isEmailVerified = user.emailVerified;
+  const isEmailVerified = user.email_verified;
   const requireEmailVerification = configuration.auth.requireEmailVerification;
+  const signInProvider = user.firebase.sign_in_provider;
 
-  if (requireEmailVerification && !isEmailVerified) {
-    return redirectToSignIn();
+  const userHasProviderWithEmailVerification =
+    signInProvider === 'password';
+
+  // verify if the user has an email/password provider linked to their account
+  if (userHasProviderWithEmailVerification) {
+    if (requireEmailVerification && !isEmailVerified) {
+      return redirectToSignIn();
+    }
   }
 
   const userData = await getUserData(user.uid);
@@ -106,16 +131,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (!userData) {
     return {
       ...translationProps,
-      props,
+      props
     };
   }
 
   const { getCurrentOrganization } = await import(
     '~/lib/server/organizations/get-current-organization'
-  );
+    );
 
   const organization = await getCurrentOrganization(user.uid);
-  const { onboarded } = user.customClaims;
+  const onboarded = user.customClaims?.onboarded;
 
   if (onboarded && organization) {
     return redirectToAppHome(ctx.locale);
@@ -123,7 +148,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     ...translationProps,
-    props,
+    props
   };
 }
 
@@ -132,14 +157,14 @@ function redirectToSignIn() {
 
   const destination = [
     paths.signIn,
-    `?returnUrl=${paths.onboarding}&signOut=true`,
+    `?returnUrl=${paths.onboarding}&signOut=true`
   ].join('/');
 
   return {
     redirect: {
       destination,
-      permanent: false,
-    },
+      permanent: false
+    }
   };
 }
 
@@ -150,8 +175,8 @@ function redirectToAppHome(locale: string | undefined) {
   return {
     redirect: {
       destination,
-      permanent: false,
-    },
+      permanent: false
+    }
   };
 }
 
@@ -169,7 +194,7 @@ async function getUserData(userId: string) {
   if (data) {
     return {
       ...data,
-      id: ref.id,
+      id: ref.id
     };
   }
 }

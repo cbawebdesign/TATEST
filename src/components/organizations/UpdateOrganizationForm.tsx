@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useStorage } from 'reactfire';
 import { Trans, useTranslation } from 'next-i18next';
@@ -14,106 +14,54 @@ import {
 
 import { OrganizationContext } from '~/lib/contexts/organization';
 import { useUpdateOrganization } from '~/lib/organizations/hooks/use-update-organization';
-import { Organization } from '~/lib/organizations/types/organization';
 
 import Button from '~/core/ui/Button';
 import TextField from '~/core/ui/TextField';
-import ImageUploadInput from '~/core/ui/ImageUploadInput';
-import Label from '~/core/ui/Label';
+import ImageUploader from '~/core/ui/ImageUploader';
 
 const UpdateOrganizationForm = () => {
-  const storage = useStorage();
   const { organization, setOrganization } = useContext(OrganizationContext);
-  const [updateOrganization, { loading }] = useUpdateOrganization();
-
-  const [logoIsDirty, setLogoIsDirty] = useState(false);
-  const [isServiceMember, setIsServiceMember] = useState(organization?.serviceMember ?? false);
+  const updateOrganizationMutation = useUpdateOrganization();
   const { t } = useTranslation('organization');
-  const currentOrganizationlastName = organization?.lastName ?? '';
+
   const currentOrganizationName = organization?.name ?? '';
   const currentLogoUrl = organization?.logoURL || null;
 
-  const { register, handleSubmit, reset, setValue } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       name: currentOrganizationName,
-      lastName: currentOrganizationlastName,
-      logoURL: currentLogoUrl,
-      serviceMember: isServiceMember
     },
   });
 
-  const onLogoCleared = useCallback(() => {
-    setLogoIsDirty(true);
-    setValue('logoURL', '');
-  }, [setValue]);
-
   const onSubmit = useCallback(
-    async (organizationName: string, organizationlastName: string, serviceMember: boolean,logoFile: Maybe<File>) => {
+    async ({ name }: { name: string }) => {
       const organizationId = organization?.id;
 
       if (!organizationId) {
         return toast.error(t(`updateOrganizationErrorMessage`));
       }
 
-      const logoName = logoFile?.name;
-
-      const logoURL = logoName
-        ? await uploadLogo({
-            logo: logoFile,
-            storage,
-            organizationId,
-          })
-        : currentLogoUrl;
-
-      const isLogoRemoved = logoIsDirty && !logoName;
-
-      // delete existing logo if different
-      if (isLogoRemoved && currentLogoUrl) {
-        try {
-          await deleteObject(ref(storage, currentLogoUrl));
-        } catch (e) {
-          // old logo not found
-        }
-      }
-
-      const organizationData: WithId<Partial<Organization>> = {
-        id: organization.id,
-        name: organizationName,
-        lastName: organizationlastName,
-        logoURL: isLogoRemoved ? null : logoURL,
-        serviceMember: isServiceMember, // Include the serviceMember value
-      };
-
-      const promise = updateOrganization(organizationData).then(() => {
-        setOrganization({
-          ...organization,
-          ...organizationData,
+      const promise = updateOrganizationMutation
+        .trigger({ name, id: organizationId })
+        .then(() => {
+          setOrganization({
+            ...organization,
+            name,
+          });
         });
-      });
 
-      await toast.promise(promise, {
+      toast.promise(promise, {
         loading: t(`updateOrganizationLoadingMessage`),
         success: t(`updateOrganizationSuccessMessage`),
         error: t(`updateOrganizationErrorMessage`),
       });
     },
-    [
-      logoIsDirty,
-      currentLogoUrl,
-      organization,
-      setOrganization,
-      storage,
-      t,
-      updateOrganization,
-      isServiceMember,
-    ],
+    [organization, setOrganization, t, updateOrganizationMutation],
   );
 
   useEffect(() => {
     reset({
       name: organization?.name,
-      lastName: organization?.lastName,
-      logoURL: organization?.logoURL,
     });
   }, [organization, reset]);
 
@@ -121,85 +69,133 @@ const UpdateOrganizationForm = () => {
     required: true,
   });
 
-  const lastNameControl = register('lastName', {
-    required: true,
-  });
-
-  const logoControl = register('logoURL');
+  if (!organization) {
+    return null;
+  }
 
   return (
-    <form
-      onSubmit={handleSubmit((value) => {
-        return onSubmit(value.name, value.lastName, value.serviceMember, getLogoFile(value.logoURL));
-      })}
-      className={'space-y-4'}
-    >
-      <div className={'flex flex-col space-y-4'}>
-        <TextField>
+    <div className={'flex flex-col space-y-8'}>
+      <UploadLogoForm
+        organizationId={organization.id}
+        currentLogoUrl={currentLogoUrl}
+        onLogoUpdated={(logoURL) => {
+          setOrganization({
+            ...organization,
+            logoURL,
+          });
+        }}
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className={'flex flex-col space-y-4'}>
           <TextField.Label>
             <Trans i18nKey={'organization:organizationNameInputLabel'} />
+
             <TextField.Input
               {...nameControl}
               data-cy={'organization-name-input'}
               required
-              placeholder={''}
+              placeholder={'ex. IndieCorp'}
             />
           </TextField.Label>
-        </TextField>
 
-        <TextField>
-          <TextField.Label>
-            <Trans i18nKey={'organization:organizationLastNameLabel'} />
-            <TextField.Input
-              {...lastNameControl}
-              data-cy={'organization-lastName-input'}
-              required
-              placeholder={''}
-            />
-          </TextField.Label>
-        </TextField>
-
-        <Label>
-          <Trans i18nKey={'organization:organizationLogoInputLabel'} />
-          <ImageUploadInput
-            {...logoControl}
-            image={currentLogoUrl}
-            onClear={onLogoCleared}
-          >
-            <Trans i18nKey={'common:imageInputLabel'} />
-          </ImageUploadInput>
-        </Label>
-
-        {/* Service Member Checkbox */}
-        <Label>
-          <Trans i18nKey={'organization:organizationserviceMemberLabel'} />
-          <input
-            type="checkbox"
-            checked={isServiceMember}
-            onChange={(e) => setIsServiceMember(e.target.checked)}
-          />
-        </Label>
-
-        <Button
-          className={'w-full md:w-auto'}
-          data-cy={'update-organization-submit-button'}
-          loading={loading}
-        >
-          <Trans i18nKey={'organization:updateOrganizationSubmitLabel'} />
-        </Button>
-      </div>
-    </form>
+          <div>
+            <Button
+              className={'w-full md:w-auto'}
+              data-cy={'update-organization-submit-button'}
+              loading={updateOrganizationMutation.isMutating}
+            >
+              <Trans i18nKey={'organization:updateOrganizationSubmitLabel'} />
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 };
 
-// ... existing functions: uploadLogo, getLogoStoragePath, getLogoFile
+function UploadLogoForm(props: {
+  currentLogoUrl: string | null | undefined;
+  organizationId: string;
+  onLogoUpdated: (url: string | null) => void;
+}) {
+  const storage = useStorage();
+  const updateOrganizatioMutation = useUpdateOrganization();
+  const { t } = useTranslation('organization');
 
-/**
- * @description Upload file to Storage
- * @param storage
- * @param organizationId
- * @param logo
- */
+  const createToaster = useCallback(
+    (promise: Promise<unknown>) => {
+      return toast.promise(promise, {
+        loading: t(`updateOrganizationLoadingMessage`),
+        success: t(`updateOrganizationSuccessMessage`),
+        error: t(`updateOrganizationErrorMessage`),
+      });
+    },
+    [t],
+  );
+
+  const onValueChange = useCallback(
+    async (file: File | null) => {
+      const removeExistingStorageFile = () => {
+        if (props.currentLogoUrl) {
+          const reference = ref(storage, props.currentLogoUrl);
+
+          return deleteObject(reference);
+        }
+
+        return Promise.resolve();
+      };
+
+      if (file) {
+        await removeExistingStorageFile();
+
+        const promise = uploadLogo({
+          storage,
+          organizationId: props.organizationId,
+          logo: file,
+        }).then(async (logoURL) => {
+          await updateOrganizatioMutation.trigger({
+            logoURL,
+            id: props.organizationId,
+          });
+
+          props.onLogoUpdated(logoURL);
+        });
+
+        createToaster(promise);
+      } else {
+        if (props.currentLogoUrl) {
+          const promise = removeExistingStorageFile().then(async () => {
+            await updateOrganizatioMutation.trigger({
+              logoURL: '',
+              id: props.organizationId,
+            });
+
+            props.onLogoUpdated(null);
+          });
+
+          createToaster(promise);
+        }
+      }
+    },
+    [createToaster, props, storage, updateOrganizatioMutation],
+  );
+
+  return (
+    <ImageUploader value={props.currentLogoUrl} onValueChange={onValueChange}>
+      <div className={'flex flex-col space-y-1'}>
+        <span className={'text-sm'}>
+          <Trans i18nKey={'organization:organizationLogoInputHeading'} />
+        </span>
+
+        <span className={'text-xs'}>
+          <Trans i18nKey={'organization:organizationLogoInputSubheading'} />
+        </span>
+      </div>
+    </ImageUploader>
+  );
+}
+
 async function uploadLogo({
   storage,
   organizationId,
@@ -222,21 +218,8 @@ async function uploadLogo({
   return await getDownloadURL(fileRef);
 }
 
-/**
- *
- * @param organizationId
- * @param fileName
- */
 function getLogoStoragePath(organizationId: string, fileName: string) {
   return [`/organizations`, organizationId, fileName].join('/');
-}
-
-function getLogoFile(value: string | null | FileList) {
-  if (!value || typeof value === 'string') {
-    return;
-  }
-
-  return value.item(0) ?? undefined;
 }
 
 export default UpdateOrganizationForm;

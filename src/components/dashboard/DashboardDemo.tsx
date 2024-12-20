@@ -1,224 +1,100 @@
-import { Line, ResponsiveContainer, LineChart, XAxis } from 'recharts';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import Link from 'next/link';
+import LogoImage from '~/core/ui/Logo/LogoImage';
 
-import Tile from '~/core/ui/Tile';
-import Heading from '~/core/ui/Heading';
-import React, { useState, useMemo } from 'react';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/core/ui/Table';
-
-import { useUserSession } from '~/core/hooks/use-user-session';
-import { Title } from '@radix-ui/react-dialog';
-import { Document, Page, pdfjs } from 'react-pdf';
+export interface AlertTrigger {
+    time: string;
+    alert: string;
+    alertName: string;
+    watchlist: string;
+    message: string;
+    symbol: string;
+}
 
 export default function DashboardDemo() {
-  const mrr = useMemo(() => generateDemoData(), []);
-  const visitors = useMemo(() => generateDemoData(), []);
-  const returningVisitors = useMemo(() => generateDemoData(), []);
-  const churn = useMemo(() => generateDemoData(), []);
-  const netRevenue = useMemo(() => generateDemoData(), []);
-  const fees = useMemo(() => generateDemoData(), []);
-  const newCustomers = useMemo(() => generateDemoData(), []);
-  const tickets = useMemo(() => generateDemoData(), []);
-  const activeUsers = useMemo(() => generateDemoData(), []);
-  const [numPages, setNumPages] = useState<number | null>(null);
-    const [pageNumber, setPageNumber] = useState(1);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [alerts, setAlerts] = useState<AlertTrigger[]>([
+    { time: "10:00 AM", alert: "Price Drop", alertName: "Alert 1", watchlist: "Watchlist A", message: "Price dropped", symbol: "AAPL" },
+    { time: "11:00 AM", alert: "Price Rise", alertName: "Alert 2", watchlist: "Watchlist B", message: "Price rose", symbol: "MSFT" }
+  ]);
 
+  useEffect(() => {
+    const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(darkMode ? "dark" : "light");
+  }, []);
 
-
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
-    setNumPages(numPages);
-  }
   return (
-    <div className={'flex flex-col pb-36'}>
-      <UserGreetings />
-  
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <h1 style={{ 
-          fontSize: '2em', 
-          textAlign: 'center', 
-          textDecoration: 'underline', 
-          fontFamily: 'Arial, sans-serif' 
-        }}>
-          Tristate Union Benefits Admin Systems Overview & User Guide
+    <div
+      className={`relative min-h-screen ${
+        theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
+      }`}
+    >
+      {/* Dynamic Background */}
+      <div
+        className={`absolute inset-0 ${
+          theme === "dark"
+            ? "bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+            : "bg-gradient-to-br from-blue-50 via-blue-100 to-purple-200"
+        } z-0`}
+        style={{
+          backgroundAttachment: "fixed",
+        }}
+      ></div>
+
+      {/* Dashboard Content */}
+      <div className="relative z-10 flex flex-col items-center p-6 space-y-6">
+        {/* Logo and Header */}
+        <LogoImage style={{ width: "160px", height: "100px" }} />
+        <h1 className="text-4xl font-extrabold tracking-tight text-center">
+          Welcome to your Trade Companion Dashboard
         </h1>
-        <div style={{ height: '70vh', overflow: 'auto' }}>
-          <Document
-            file="/assets/images/tr.pdf"
-            onLoadSuccess={onDocumentLoadSuccess}
-          >
-            <Page pageNumber={pageNumber} renderTextLayer={false} />
-          </Document>
+        <p className="text-center max-w-prose text-lg italic">
+          Monitor your alerts and watchlists below.
+        </p>
+
+        {/* Alerts List */}
+        <div className="w-full max-w-6xl bg-opacity-70 rounded-xl shadow-2xl backdrop-blur-lg p-6">
+          {/* Alerts Header */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold tracking-wide">
+              Alerts
+            </h2>
+          </div>
+
+          {/* Alerts Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-200 dark:bg-gray-700">
+                <tr>
+                  <th className="px-6 py-3 text-left">Time</th>
+                  <th className="px-6 py-3 text-left">Alert</th>
+                  <th className="px-6 py-3 text-left">Watchlist</th>
+                  <th className="px-6 py-3 text-left">Symbol</th>
+                  <th className="px-6 py-3 text-left">Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {alerts.map((alert, index) => (
+                  <tr
+                    key={index}
+                    className="transition duration-200 transform hover:scale-[1.01] hover:shadow-lg hover:rounded-lg hover:border-[2px] hover:border-transparent hover:bg-gradient-to-r hover:from-blue-500 hover:via-cyan-500 hover:to-purple-500"
+                  >
+                    <td className="px-6 py-3 font-medium">{alert.time}</td>
+                    <td className="px-6 py-3">{alert.alert}</td>
+                    <td className="px-6 py-3">{alert.watchlist}</td>
+                    <td className="px-6 py-3">{alert.symbol}</td>
+                    <td className="px-6 py-3">{alert.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <p>Page {pageNumber} of {numPages ?? 'unknown'}</p>
-        <div>
-          <button 
-            style={{
-              backgroundColor: '#000033', 
-              color: 'white', 
-              borderRadius: '5px', 
-              boxShadow: '3px 3px 5px 0px rgba(0,0,0,0.75)', 
-              padding: '10px 20px', 
-              margin: '10px', 
-              border: 'none'
-            }}
-            onClick={() => setPageNumber(pageNumber - 1)} 
-            disabled={pageNumber <= 1}
-          >
-            Previous
-          </button>
-          <button 
-            style={{
-              backgroundColor: '#000033', 
-              color: 'white', 
-              borderRadius: '5px', 
-              boxShadow: '3px 3px 5px 0px rgba(0,0,0,0.75)', 
-              padding: '10px 20px', 
-              margin: '10px', 
-              border: 'none'
-            }}
-            onClick={() => setPageNumber(pageNumber + 1)} 
-            disabled={pageNumber >= (numPages ?? 1)}
-          >
-            Next
-          </button>
-        </div>
+
+        <Link href="/anotherPage">
+          <a className="text-blue-500 hover:underline">Go to another page</a>
+        </Link>
       </div>
     </div>
-  );
-}
-
-function UserGreetings() {
-  const user = useUserSession();
-  const userDisplayName = user?.auth?.displayName ?? user?.auth?.email ?? '';
-
-  return (
-    <div>
-      <Heading type={4}>Welcome Back, {userDisplayName}</Heading>
-
-      <p className={'text-gray-500 dark:text-gray-400'}>
-        <span>Here&apos;s what is happening across your business</span>
-      </p>
-    </div>
-  );
-}
-
-function generateDemoData() {
-  const today = new Date();
-
-  const formatter = new Intl.DateTimeFormat('en-us', {
-    month: 'long',
-    year: '2-digit',
-  });
-
-  const data: { value: string; name: string }[] = [];
-
-  for (let n = 8; n > 0; n -= 1) {
-    const date = new Date(today.getFullYear(), today.getMonth() - n, 1);
-
-    data.push({
-      name: formatter.format(date) as string,
-      value: (Math.random() * 10).toFixed(1),
-    });
-  }
-
-  return [data, data[data.length - 1].value] as [typeof data, string];
-}
-
-function Chart(
-  props: React.PropsWithChildren<{ data: { value: string; name: string }[] }>,
-) {
-  return (
-    <div className={'h-36'}>
-      <ResponsiveContainer width={'100%'} height={'100%'}>
-        <LineChart data={props.data}>
-          <Line
-            className={'text-primary'}
-            type="monotone"
-            dataKey="value"
-            stroke="currentColor"
-            strokeWidth={2.5}
-            dot={false}
-          />
-
-          <XAxis
-            style={{ fontSize: 9 }}
-            axisLine={false}
-            tickSize={0}
-            dataKey="name"
-            height={15}
-            dy={10}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-
-    
-  );
-}
-
-function CustomersTable() {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Placeholder</TableHead>
-          <TableHead>Placeholder</TableHead>
-          <TableHead>Placeholder</TableHead>
-          <TableHead>Placeholder</TableHead>
-          <TableHead>Placeholder</TableHead>
-        </TableRow>
-      </TableHeader>
-
-      <TableBody>
-        <TableRow>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>
-            <Tile.Badge trend={'up'}>Placeholder</Tile.Badge>
-          </TableCell>
-        </TableRow>
-
-        <TableRow>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>
-            <Tile.Badge trend={'stale'}>Placeholder</Tile.Badge>
-          </TableCell>
-        </TableRow>
-
-        <TableRow>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell></TableCell>
-          <TableCell>
-            <Tile.Badge trend={'up'}>Placeholder</Tile.Badge>
-          </TableCell>
-        </TableRow>
-
-        <TableRow>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>Placeholder</TableCell>
-          <TableCell>
-            <Tile.Badge trend={'down'}>Placeholder</Tile.Badge>
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-
-    
   );
 }

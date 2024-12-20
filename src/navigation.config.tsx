@@ -1,73 +1,72 @@
 import configuration from '~/configuration';
-import { Cog8ToothIcon, ShieldCheckIcon, CodeBracketIcon, Squares2X2Icon, MagnifyingGlassPlusIcon, CodeBracketSquareIcon, ArchiveBoxArrowDownIcon, UserPlusIcon, ServerIcon, ArrowPathRoundedSquareIcon, PlusCircleIcon, PlusSmallIcon, PlusIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 
-const NAVIGATION_CONFIG = {
+import {
+  CreditCardIcon,
+  Squares2X2Icon,
+  Square3Stack3DIcon,
+  UserGroupIcon,
+  UserIcon,
+} from '@heroicons/react/24/outline';
+import { BellIcon, CogIcon, ViewIcon } from 'lucide-react';
+
+type Divider = {
+  divider: true;
+};
+
+type NavigationItemLink = {
+  label: string;
+  path: string;
+  Icon: (props: { className: string }) => JSX.Element;
+  end?: boolean;
+};
+
+type NavigationGroup = {
+  label: string;
+  collapsible?: boolean;
+  collapsed?: boolean;
+  children: NavigationItemLink[];
+};
+
+type NavigationItem = NavigationItemLink | NavigationGroup | Divider;
+
+type NavigationConfig = {
+  items: NavigationItem[];
+};
+
+const NAVIGATION_CONFIG: NavigationConfig = {
   items: [
     {
-      label: 'common:dashboardTabLabel',
-      path: '/dashboard',
+      label: 'common:watchlistlabel',
+      path: '/watchlist',
       Icon: ({ className }: { className: string }) => {
-        return <DocumentCheckIcon className={className} />;
+        return <ViewIcon className={className} />;
       },
     },
     {
-      label: 'common:settingsTabLabel',
-      path: '/settings',
+      label: 'common:alertslabel',
+      path: configuration.paths.appHome,
       Icon: ({ className }: { className: string }) => {
-        return <Cog8ToothIcon className={className} />;
+        return <BellIcon className={className} />;
       },
     },
     {
-      label: 'common:AddUnionLabel',
-      path: '/addunion',
+      label: 'common:configlabel',
+      path: '/config',
       Icon: ({ className }: { className: string }) => {
-        return <PlusCircleIcon className={className} />;
+        return <CogIcon className={className} />;
       },
     },
-    {
-      label: 'common:CreateUserLabel',
-      path: '/adduser',
-      Icon: ({ className }: { className: string }) => {
-        return <UserPlusIcon className={className} />;
-      },
-    },
-    {
-      label: 'common:searchLabel',
-      path: '/search',
-      Icon: ({ className }: { className: string }) => {
-        return <MagnifyingGlassPlusIcon        className={className} />;
-      },
-    },
-    {
-      label: 'common:reportsLabel',
-      path: '/dataview',
-      Icon: ({ className }: { className: string }) => {
-        return <ArchiveBoxArrowDownIcon        className={className} />;
-      },
-    },
-    {
-      label: 'common:OutgoingLabel',
-      path: '/outgoing',
-      Icon: ({ className }: { className: string }) => {
-        return <ServerIcon        className={className} />;
-      },
-    },
-    {
-      label: 'common:adminLabel',
-      path: '/admin',
-      Icon: ({ className }: { className: string }) => {
-        return <ShieldCheckIcon
-        className={className} />;
-      },
-    },
-    {
-      label: 'common:NYLabel',
-      path: '/nystate',
-      Icon: ({ className }: { className: string }) => {
-        return <CodeBracketSquareIcon className={className} />;
-      },
-    },
+    
+        {
+          label: 'common:profileSettingsTabLabel',
+          path: configuration.paths.settings.profile,
+          Icon: ({ className }: { className: string }) => {
+            return <UserIcon className={className} />;
+          },
+        },
+    
   
+   
   ],
 };
 

@@ -11,9 +11,6 @@ const organizationPageObject = {
   $createOrganizationButton: () => $get(`create-organization-button`),
   $confirmCreateOrganizationButton: () =>
     $get(`confirm-create-organization-button`),
-
-  $createOrganizationNewInput: () => $get(`create-organization-new-input`),
-
   $createOrganizationNameInput: () => $get(`create-organization-name-input`),
   $getMemberByEmail(invitedMemberEmail: string) {
     return cy.contains(`[data-cy="organization-member"]`, invitedMemberEmail);
@@ -48,16 +45,30 @@ const organizationPageObject = {
     return DEFAULT_ORGANIZATION_ID;
   },
   createOrganization(organizationName: string) {
-    organizationPageObject.$currentOrganization().wait(100).click();
+    organizationPageObject
+      .$currentOrganization()
+      .wait(500)
+      .click({
+        force: true,
+      })
+      .then(() => {
+        return organizationPageObject.$createOrganizationButton();
+      })
+      .should('be.visible');
+
     organizationPageObject.$createOrganizationButton().click();
 
     organizationPageObject
       .$createOrganizationNameInput()
       .wait(500)
       .clear()
-      .type(organizationName);
+      .type(organizationName, {
+        delay: 200,
+      });
 
-    organizationPageObject.$confirmCreateOrganizationButton().click().wait(500);
+    organizationPageObject.$confirmCreateOrganizationButton().click();
+
+    cy.wait(750);
 
     // close the select
     cy.get('body').click({
@@ -68,10 +79,22 @@ const organizationPageObject = {
     cy.setCookie('organizationId', DEFAULT_ORGANIZATION_ID);
   },
   switchToOrganization(name: string) {
-    this.$currentOrganization().wait(500).click();
-
-    cy.contains('[data-cy="organization-selector-item"]', name).click();
-    organizationPageObject.assertCurrentOrganization(name);
+    this.$currentOrganization()
+      .click({
+        force: true,
+      })
+      .then(() => {
+        return cy.contains('[data-cy="organization-selector-item"]', name);
+      })
+      .should('be.visible')
+      .then((el) => {
+        return cy.wrap(el).click({
+          force: true,
+        });
+      })
+      .then(() => {
+        organizationPageObject.assertCurrentOrganization(name);
+      });
 
     return this;
   },

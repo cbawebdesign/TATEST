@@ -14,7 +14,6 @@ export async function getUserInfoById(userId: string) {
     if (!user) {
       return null;
     }
-    console.log('Custom claims:', user.customClaims); // Add this line
 
     return {
       uid: user.uid,

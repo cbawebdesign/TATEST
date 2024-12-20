@@ -102,9 +102,8 @@ export async function inviteMembers(params: Params) {
           inviteId: ref.id,
           inviter: inviter?.uid,
           organizationId,
-          error,
         },
-        `Error while sending invite to member`,
+        `Error while sending invite to member: ${error}`,
       );
 
       return Promise.reject(error);
@@ -196,10 +195,10 @@ export async function inviteMembers(params: Params) {
     }
   }
 
-  return Promise.all(requests);
+  return Promise.allSettled(requests);
 }
 
-function sendInviteEmail(props: {
+async function sendInviteEmail(props: {
   invitedUserEmail: string;
   inviteCode: string;
   organizationName: string;
@@ -224,7 +223,7 @@ function sendInviteEmail(props: {
   const subject = 'You have been invited to join an organization!';
   const link = getInvitePageFullUrl(inviteCode);
 
-  const html = renderInviteEmail({
+  const html = await renderInviteEmail({
     productName,
     link,
     organizationName,

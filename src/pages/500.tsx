@@ -1,3 +1,5 @@
+import { GetStaticPropsContext } from 'next';
+
 import Head from 'next/head';
 import { Trans } from 'next-i18next';
 
@@ -50,11 +52,7 @@ const InternalServerErrorPage = () => {
                 </div>
 
                 <div className={'flex space-x-4'}>
-                  <Button variant={'secondary'} href={'/'}>
-                    <Trans i18nKey={'common:contactUs'} />
-                  </Button>
-
-                  <Button href={'/'}>
+                  <Button href={'/'} variant={'outline'}>
                     <Trans i18nKey={'common:backToHomePage'} />
                   </Button>
                 </div>
@@ -67,11 +65,11 @@ const InternalServerErrorPage = () => {
   );
 };
 
-export async function getStaticProps() {
-  const { props } = await withTranslationProps();
+export async function getStaticProps({ locale }: GetStaticPropsContext) {
+  const { props } = await withTranslationProps({ locale });
 
   return {
-    props,
+    props
   };
 }
 

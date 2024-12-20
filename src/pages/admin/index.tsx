@@ -14,6 +14,7 @@ import {
 } from '~/lib/firestore-collections';
 
 import configuration from '~/configuration';
+import { PageBody } from '~/core/ui/Page';
 
 function AdminPage(
   props: React.PropsWithChildren<{
@@ -22,7 +23,6 @@ function AdminPage(
       organizationsCount: number;
       activeSubscriptions: number;
       trialSubscriptions: number;
-      cobacount: number;
     };
   }>,
 ) {
@@ -34,9 +34,9 @@ function AdminPage(
 
       <AdminHeader>Admin</AdminHeader>
 
-      <div className={'p-3'}>
+      <PageBody>
         <AdminDashboard data={props.data} />
-      </div>
+      </PageBody>
     </AdminRouteShell>
   );
 }
@@ -66,26 +66,19 @@ async function loadData() {
   const firestore = getRestFirestore();
 
   const organizationsResponse = await firestore
-    .collection(USERS_COLLECTION)
-    .where('union', '==', 'L831') // Compare to boolean true
+    .collection(ORGANIZATIONS_COLLECTION)
+    .count()
+    .get();
 
+  const activeSubscriptionsResponse = await firestore
+    .collection(ORGANIZATIONS_COLLECTION)
+    .where('subscription.status', '==', 'active')
     .count()
     .get();
-    const cobaResponse = await firestore
-    .collection(USERS_COLLECTION)
-    .where('union', '==', 'COBA') // Compare to boolean true
 
-    .count()
-    .get();
-    const activeSubscriptionsResponse = await firestore
-    .collection(USERS_COLLECTION)
-    .where('Active', '==', true) // Compare to boolean true
-    .count()
-    .get();
-  
   const trialSubscriptionsResponse = await firestore
-    .collection(USERS_COLLECTION)
-    .where('Active', '==', false) // Compare to boolean false
+    .collection(ORGANIZATIONS_COLLECTION)
+    .where('subscription.status', '==', 'trial')
     .count()
     .get();
 
@@ -98,13 +91,11 @@ async function loadData() {
   const { count: activeSubscriptions } = activeSubscriptionsResponse.data();
   const { count: trialSubscriptions } = trialSubscriptionsResponse.data();
   const { count: usersCount } = usersResponse.data();
-  const { count: cobacount } = cobaResponse.data();
 
   return {
     usersCount,
     organizationsCount,
     activeSubscriptions,
     trialSubscriptions,
-    cobacount
   };
 }

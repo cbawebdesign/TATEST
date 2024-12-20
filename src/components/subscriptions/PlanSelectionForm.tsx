@@ -38,7 +38,48 @@ const PlanSelectionForm: React.FCC<{
           <EmbeddedStripeCheckout clientSecret={clientSecret as string} />
         </If>
 
-    
+        <div className={'flex w-full flex-col space-y-8'}>
+          <div>
+            <Alert type={'info'}>
+              <Alert.Heading>
+                It&apos;s a test account, don&apos;t worry
+              </Alert.Heading>
+              Use the card 4242 4242 4242 4242 to successfully subscribe to a
+              plan. Don&apos;t worry, it&apos;s a testing account. All the plans
+              point to the same Stripe product.
+            </Alert>
+          </div>
+
+          <PricingTable
+            CheckoutButton={(props) => {
+              return (
+                <CheckoutRedirectButton
+                  organizationId={organization.id}
+                  stripePriceId={props.stripePriceId}
+                  recommended={props.recommended}
+                  onCheckoutCreated={setClientSecret}
+                >
+                  <Trans
+                    i18nKey={'subscription:checkout'}
+                    defaults={'Checkout'}
+                  />
+                </CheckoutRedirectButton>
+              );
+            }}
+          />
+
+          <If condition={customerId}>
+            <div className={'flex flex-col space-y-2'}>
+              <BillingPortalRedirectButton customerId={customerId as string}>
+                <Trans i18nKey={'subscription:manageBilling'} />
+              </BillingPortalRedirectButton>
+
+              <span className={'text-xs text-gray-500 dark:text-gray-400'}>
+                <Trans i18nKey={'subscription:manageBillingDescription'} />
+              </span>
+            </div>
+          </If>
+        </div>
       </IfHasPermissions>
     </div>
   );

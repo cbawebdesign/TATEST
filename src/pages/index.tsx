@@ -38,16 +38,23 @@ function Index() {
           
 
             <HeroTitle>
-              <span>Tristate Union Benefits</span>
+              <span>Trade Companion</span>
               <span
                 className={
                   'bg-gradient-to-br bg-clip-text text-transparent' +
                   ' from-blue-400 to-blue-700 leading-[1.2]'
                 }
               >
-                Admin Dashboard
-              </span>
+                              </span>
+              <span
+    className={
+      'text-center text-2xl text-gray-600 dark:text-white md:text-3xl' +
+      ' flex flex-col font-heading font-medium xl:text-5xl 2xl:text-[4.2rem]'
+    }
+  >
+  </span>
             </HeroTitle>
+            
 
             <SubHeading className={'text-center'}>
              
@@ -77,7 +84,7 @@ function Index() {
             }
             width={2688}
             height={1824}
-            src={`/assets/images/bannershap.png`}
+            src={`/assets/images/trading.jpg`}
             alt={`App Image`}
           />
         </div>
