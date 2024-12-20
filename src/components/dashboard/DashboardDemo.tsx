@@ -49,7 +49,7 @@ export default function DashboardDemo() {
           Welcome to your Trade Companion Dashboard
         </h1>
         <p className="text-center max-w-prose text-lg italic">
-          Monitor your alerts and watchlists below.
+          Monitor your alerts and watchlists below
         </p>
 
         {/* Alerts List */}
